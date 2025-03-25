@@ -3,19 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 // Helper function to verify token (moved from middleware)
-const verifyToken = (req) => {
-    const authHeader = req.headers.authorization;
-    if (authHeader) {
-        const token = authHeader.split(' ')[1];
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            return decoded; // Return the decoded payload
-        } catch (error) {
-            return null; // Token is invalid or expired
-        }
-    }
-    return null; // No token provided
-};
+ // No token provided
 
 
 // @desc    Get all projects

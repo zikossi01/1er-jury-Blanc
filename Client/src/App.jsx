@@ -1,83 +1,182 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import toast, { Toaster } from 'react-hot-toast';
 import Dashboard from "./components/Dashboard";
 import ProjectForm from "./components/ProjectForm";
-import TaskForm from "./components/TaskForm";
-import ResourceForm from "./components/ResourceForm";
-import ProjectList from "./components/ProjectList";
-import TaskList from "./components/TaskList";
-import ResourceList from "./components/ResourceList";
-import { motion } from "framer-motion";
-
-// Helper functions to handle localStorage
-const loadFromLocalStorage = (key, defaultValue) => {
-  const storedData = localStorage.getItem(key);
-  return storedData ? JSON.parse(storedData) : defaultValue;
-};
-
-const saveToLocalStorage = (key, value) => {
-  localStorage.setItem(key, JSON.stringify(value));
-};
+import ProjectDetails from "./components/ProjectDetails";
+import TaskDetails from "./components/TaskDetails";
 
 function App() {
-  const [projects, setProjects] = useState(loadFromLocalStorage("projects", []));
-  const [tasks, setTasks] = useState(loadFromLocalStorage("tasks", []));
-  const [resources, setResources] = useState(loadFromLocalStorage("resources", []));
-
-  // Update localStorage whenever state changes
-  useEffect(() => {
-    saveToLocalStorage("projects", projects);
-    saveToLocalStorage("tasks", tasks);
-    saveToLocalStorage("resources", resources);
-  }, [projects, tasks, resources]);
+  const [projects, setProjects] = useState([]);
 
   const addProject = (newProject) => {
-    setProjects((prevProjects) => [...prevProjects, newProject]);
+    try {
+      setProjects([...projects, { ...newProject, tasks: [] }]);
+      toast.success("Project created successfully!");
+    } catch (error) {
+      toast.error("Failed to create project");
+      console.error(error);
+    }
   };
 
-  const addTask = (newTask) => {
-    setTasks([...tasks, newTask]);
+  const deleteProject = (index) => {
+    try {
+      setProjects(projects.filter((_, i) => i !== index));
+      toast.success("Project deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete project");
+      console.error(error);
+    }
   };
 
-  const addResource = (newResource) => {
-    setResources([...resources, newResource]);
+  const addTaskToProject = (projectIndex, newTask) => {
+    try {
+      const updatedProjects = [...projects];
+      updatedProjects[projectIndex].tasks.push({ ...newTask, resources: [] });
+      setProjects(updatedProjects);
+      toast.success("Task added successfully!");
+    } catch (error) {
+      toast.error("Failed to add task");
+      console.error(error);
+    }
+  };
+
+  const deleteTask = (projectIndex, taskIndex) => {
+    try {
+      const updatedProjects = [...projects];
+      updatedProjects[projectIndex].tasks = updatedProjects[projectIndex].tasks.filter((_, i) => i !== taskIndex);
+      setProjects(updatedProjects);
+      toast.success("Task deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete task");
+      console.error(error);
+    }
+  };
+
+  const editTask = (projectIndex, taskIndex, updatedTask) => {
+    try {
+      const updatedProjects = [...projects];
+      updatedProjects[projectIndex].tasks[taskIndex] = { ...updatedTask };
+      setProjects(updatedProjects);
+      toast.success("Task updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update task");
+      console.error(error);
+    }
+  };
+
+  // Resource operations
+  const addResourceToTask = (projectIndex, taskIndex, newResource) => {
+    try {
+      const updatedProjects = [...projects];
+      updatedProjects[projectIndex].tasks[taskIndex].resources.push(newResource);
+      setProjects(updatedProjects);
+      toast.success("Resource added successfully!");
+    } catch (error) {
+      toast.error("Failed to add resource");
+      console.error(error);
+    }
+  };
+
+  const updateResourceInTask = (projectIndex, taskIndex, resourceIndex, updatedResource) => {
+    try {
+      const updatedProjects = [...projects];
+      updatedProjects[projectIndex].tasks[taskIndex].resources[resourceIndex] = updatedResource;
+      setProjects(updatedProjects);
+      toast.success("Resource updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update resource");
+      console.error(error);
+    }
+  };
+
+  const deleteResourceFromTask = (projectIndex, taskIndex, resourceIndex) => {
+    try {
+      const updatedProjects = [...projects];
+      updatedProjects[projectIndex].tasks[taskIndex].resources = 
+        updatedProjects[projectIndex].tasks[taskIndex].resources.filter((_, i) => i !== resourceIndex);
+      setProjects(updatedProjects);
+      toast.success("Resource deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete resource");
+      console.error(error);
+    }
   };
 
   return (
     <Router>
+      {/* Add the Toaster component here */}
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: '#1F2937',
+            color: '#fff',
+            border: '1px solid #374151',
+            padding: '16px',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+      
       <motion.div
-        className="app-container bg-gray-900 text-white font-sans min-h-screen"
+        className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 1 }}
       >
-        <div className="flex">
-          {/* Sidebar */}
-          <aside className="w-64 bg-gray-800 p-5">
-            <h2 className="text-xl text-blue-500">ConstructionXpert</h2>
-            <nav>
-              <ul className="mt-4">
-                <li><a href="/" className="text-white">Dashboard</a></li>
-                <li><a href="/projects" className="text-white">Projects</a></li>
-                <li><a href="/tasks" className="text-white">Tasks</a></li>
-                <li><a href="/resources" className="text-white">Resources</a></li>
-              </ul>
-            </nav>
-          </aside>
+        <nav className="flex justify-between items-center mb-8">
+          <Link to="/" className="text-xl font-bold text-blue-400 hover:scale-105 transition-all">
+            🏠 Dashboard
+          </Link>
+          <Link
+            to="/create-project"
+            className="bg-blue-600 px-4 py-2 rounded-xl text-white font-semibold shadow-lg hover:bg-blue-700 transition-all"
+          >
+            ➕ Create Project
+          </Link>
+        </nav>
 
-          {/* Main Content */}
-          <div className="flex-1 p-10">
-            <Routes>
-              <Route path="/" element={<Dashboard projects={projects} tasks={tasks} resources={resources} />} />
-              <Route path="/projects" element={<ProjectList projects={projects} />} />
-              <Route path="/projects/create" element={<ProjectForm addProject={addProject} />} />
-              <Route path="/projects/:projectId/tasks/create" element={<TaskForm addTask={addTask} />} />
-              <Route path="/tasks" element={<TaskList tasks={tasks} />} />
-              <Route path="/tasks/:taskId/resources/create" element={<ResourceForm addResource={addResource} />} />
-              <Route path="/resources" element={<ResourceList resources={resources} />} />
-            </Routes>
-          </div>
-        </div>
+        <Routes>
+          <Route path="/" element={<Dashboard projects={projects} deleteProject={deleteProject} />} />
+          <Route path="/create-project" element={<ProjectForm addProject={addProject} />} />
+          <Route
+            path="/project/:projectId"
+            element={
+              <ProjectDetails 
+                projects={projects} 
+                addTaskToProject={addTaskToProject} 
+                deleteTask={deleteTask} 
+                editTask={editTask} 
+              />
+            }
+          />
+          <Route
+            path="/project/:projectId/task/:taskId"
+            element={
+              <TaskDetails 
+                projects={projects} 
+                addResourceToTask={addResourceToTask}
+                updateResourceInTask={updateResourceInTask}
+                deleteResourceFromTask={deleteResourceFromTask}
+              />
+            }
+          />
+        </Routes>
       </motion.div>
     </Router>
   );
