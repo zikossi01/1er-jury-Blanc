@@ -1,0 +1,72 @@
+/* From Uiverse.io by UtariD86 */ 
+.addbutton {
+  width: 150px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background: #00a600;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+  background: #00a600;
+}
+
+.addbutton,
+.addbutton span {
+  transition: 200ms;
+}
+
+.addbutton .text {
+  transform: translateX(35px);
+  color: white;
+  font-weight: bold;
+}
+
+.addbutton .icon {
+  position: absolute;
+  border-left: 1px solid #007300;
+  transform: translateX(110px);
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.addbutton svg {
+  width: 15px;
+  fill: #eee;
+}
+
+.addbutton:hover {
+  background: #00a600;
+}
+
+.addbutton:active {
+  background: #00cc00;
+}
+
+.addbutton:hover .text {
+  color: transparent;
+}
+
+.addbutton:hover .icon {
+  width: 150px;
+  border-left: none;
+  transform: translateX(0);
+}
+
+.addbutton:focus {
+  outline: none;
+}
+
+.addbutton:active .icon svg {
+  transform: scale(0.8);
+}
+
+.buttonSpan {
+  color: white;
+  margin: 150px;
+  font-size: 30px;
+}
